@@ -1,1 +1,1 @@
-export { default } from './ContactScreen';
+export { default } from './ContactPage';

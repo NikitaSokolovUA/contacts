@@ -10,16 +10,10 @@ const UserCard = ({ user }) => {
         height: 300,
         justifyContent: 'center',
         alignItems: 'center',
-        border: 1,
       }}
+      boxShadow={2}
     >
-      <Avatar
-        // alt={user.lastName}
-        // src="../../../assets/user.png"
-
-        src="/broken-image.jpg"
-        sx={{ width: 100, height: 100 }}
-      />
+      <Avatar src="/broken-image.jpg" sx={{ width: 100, height: 100 }} />
 
       <CardContent>
         <Typography variant="h6" component="h3" textAlign="center">

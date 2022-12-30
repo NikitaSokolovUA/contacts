@@ -1,1 +1,1 @@
-export { default } from './FormScreen';
+export { default } from './FormPage';

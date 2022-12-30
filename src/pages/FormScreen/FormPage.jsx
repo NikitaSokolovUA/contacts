@@ -1,13 +1,10 @@
 import { Container, TextField, Button, Stack, Box } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../firebase/config';
-import { nanoid } from 'nanoid';
 import { useDispatch } from 'react-redux';
 import { createUser } from 'redux/users/userOperations';
-import PickerDate from 'components/PickerDate';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import InputMask from 'react-input-mask';
 
 const initialCredentials = {
@@ -15,15 +12,13 @@ const initialCredentials = {
   lastName: '',
   email: '',
   phone: '',
-  birthDate: '',
-  avatar: '',
+  birthDate: null,
 };
 
 const FormScreen = () => {
   const dispatch = useDispatch();
 
   const [credentials, setCredentials] = useState(initialCredentials);
-  const [urlAvatar, setUrlAvatar] = useState(null);
 
   const handleChange = (event, key) => {
     setCredentials(prevState => ({ ...prevState, [key]: event.target.value }));
@@ -32,29 +27,9 @@ const FormScreen = () => {
   const handleSubmit = e => {
     console.log(credentials);
 
-    if (urlAvatar) {
-      console.log(urlAvatar);
-      uploadAvatar();
-    }
-
     dispatch(createUser(credentials));
     setCredentials(initialCredentials);
     e.preventDefault();
-  };
-
-  const uploadAvatar = async () => {
-    const responce = await fetch(urlAvatar);
-    const image = await responce.blob();
-    const id = nanoid();
-
-    const storageRef = ref(storage, `avatar/${id}`);
-
-    await uploadBytes(storageRef, image);
-    const avatarUrl = await getDownloadURL(storageRef);
-
-    console.log(avatarUrl);
-
-    setCredentials(prevState => ({ ...prevState, avatar: avatarUrl }));
   };
 
   return (
@@ -129,22 +104,22 @@ const FormScreen = () => {
           </Box>
 
           <Box component="span" sx={{ width: '300px', alignItems: 'center' }}>
-            <PickerDate setCredentials={setCredentials} />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="Date if birthday"
+                value={credentials.birthDate}
+                onChange={date =>
+                  setCredentials(prevState => ({
+                    ...prevState,
+                    birthDate: date.format('DD/MM/YYYY'),
+                  }))
+                }
+                renderInput={params => <TextField {...params} />}
+                disableFuture={true}
+              />
+            </LocalizationProvider>
           </Box>
 
-          <Button
-            variant="outlined"
-            component="label"
-            endIcon={<AddPhotoAlternateIcon />}
-            onChange={e => {
-              // const img = e.target.value.blob();
-              console.log(e);
-              setUrlAvatar(e.target.value);
-            }}
-          >
-            {urlAvatar ? 'Loaded' : 'Load Avatar'}
-            <input hidden accept="image/*" multiple type="file" />
-          </Button>
           <Button variant="outlined" type="submit">
             Submit
           </Button>
